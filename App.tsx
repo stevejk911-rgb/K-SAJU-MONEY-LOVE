@@ -10,7 +10,6 @@ import { generateSajuReading } from './services/geminiService';
 import { Loader2 } from 'lucide-react';
 import { PayPalScriptProvider } from "@paypal/react-paypal-js";
 
-// PayPal Client ID
 const PAYPAL_CLIENT_ID = "AVdHM8ow4Q4aMTd_m9WDCqr8IYNWxCX_r3mc855R08Z4_xzXZ_laPfk51qAJttiBVzhICIZ-GJC4Uj6i"; 
 
 const App: React.FC = () => {
@@ -49,7 +48,6 @@ const App: React.FC = () => {
     try {
       const minTimePromise = new Promise(resolve => setTimeout(resolve, 3000));
       const apiPromise = generateSajuReading(formData, false);
-      
       const [_, response] = await Promise.all([minTimePromise, apiPromise]);
       setResult(response);
       setStep(prev => prev + 1); 
@@ -65,6 +63,7 @@ const App: React.FC = () => {
   const renderModeSelect = () => (
     <div className="w-full max-w-md mx-auto animate-fade-in-up">
       <div className="text-center mb-16">
+        {/* Removed italic from SPOILER ALERT. */}
         <h1 className="text-6xl font-heading font-black text-white mb-6 tracking-tighter uppercase leading-[0.8] drop-shadow-2xl">
           {COPY.mode.title}
         </h1>
@@ -109,7 +108,6 @@ const App: React.FC = () => {
   const renderPersonForm = (type: 'user' | 'partner') => {
     const data = type === 'user' ? formData.user : formData.partner;
     const copy = type === 'user' ? COPY.user_details : COPY.partner_details;
-    
     const handleChange = (f: string, v: string) => {
       if (type === 'partner' && !formData.partner) {
           setFormData(prev => ({ ...prev, partner: { name: '', birthDate: '', birthTime: 'unknown', gender: 'F', [f]: v }}));
@@ -117,11 +115,9 @@ const App: React.FC = () => {
           updateFormData(f, v, type);
       }
     };
-
     const handleDateChange = (part: 'year' | 'month' | 'day', val: string) => {
         const current = data?.birthDate || '--';
         const [y, m, d] = current.includes('-') ? current.split('-') : ['', '', ''];
-        
         let newDate = '';
         if (part === 'year') {
           const cleaned = val.replace(/\D/g, '').slice(0, 4);
@@ -137,52 +133,22 @@ const App: React.FC = () => {
            }
            newDate = `${y}-${m}-${safeDay}`;
         }
-        
         handleChange('birthDate', newDate);
     };
-
     const [year, month, day] = (data?.birthDate || '').split('-');
-    const isReady = data && 
-                    data.name.trim().length > 0 && 
-                    year && year.length === 4 && 
-                    month && 
-                    day && day.length > 0 &&
-                    data.gender;
-
+    const isReady = data && data.name.trim().length > 0 && year && year.length === 4 && month && day && day.length > 0 && data.gender;
     return (
       <InputCard title={copy.title} subtitle={copy.subtitle}>
         <div className="space-y-6">
           <div className="group">
-            <label className="block text-[10px] text-zinc-500 mb-2 ml-1 uppercase font-black tracking-[0.2em] group-focus-within:text-red-700 transition-colors">
-              Name <span className="text-red-700">*</span>
-            </label>
-            <input
-              type="text"
-              placeholder={copy.name_ph}
-              value={data?.name || ''}
-              onChange={(e) => handleChange('name', e.target.value)}
-              className="w-full bg-black border border-zinc-900 rounded-none p-4 text-white placeholder-zinc-800 focus:outline-none focus:border-red-700 transition-all font-medium uppercase tracking-widest text-xs"
-            />
+            <label className="block text-[10px] text-zinc-500 mb-2 ml-1 uppercase font-black tracking-[0.2em] group-focus-within:text-red-700 transition-colors">Name <span className="text-red-700">*</span></label>
+            <input type="text" placeholder={copy.name_ph} value={data?.name || ''} onChange={(e) => handleChange('name', e.target.value)} className="w-full bg-black border border-zinc-900 rounded-none p-4 text-white placeholder-zinc-800 focus:outline-none focus:border-red-700 transition-all font-medium uppercase tracking-widest text-xs" />
           </div>
-
           <div>
-            <label className="block text-[10px] text-zinc-500 mb-2 ml-1 uppercase font-black tracking-[0.2em]">
-              Date of Birth <span className="text-red-700">*</span>
-            </label>
+            <label className="block text-[10px] text-zinc-500 mb-2 ml-1 uppercase font-black tracking-[0.2em]">Date of Birth <span className="text-red-700">*</span></label>
             <div className="flex gap-2">
-                <input 
-                    type="text"
-                    inputMode="numeric"
-                    placeholder="YYYY" 
-                    value={year || ''}
-                    onChange={(e) => handleDateChange('year', e.target.value)}
-                    className="w-1/3 bg-black border border-zinc-900 rounded-none p-4 text-white placeholder-zinc-800 focus:outline-none focus:border-red-700 transition-all text-center text-xs tracking-widest"
-                />
-                <select 
-                    value={month || ''}
-                    onChange={(e) => handleDateChange('month', e.target.value)}
-                    className="w-1/3 bg-black border border-zinc-900 rounded-none p-4 text-white focus:outline-none focus:border-red-700 appearance-none text-center text-xs tracking-widest uppercase font-bold"
-                >
+                <input type="text" inputMode="numeric" placeholder="YYYY" value={year || ''} onChange={(e) => handleDateChange('year', e.target.value)} className="w-1/3 bg-black border border-zinc-900 rounded-none p-4 text-white placeholder-zinc-800 focus:outline-none focus:border-red-700 transition-all text-center text-xs tracking-widest" />
+                <select value={month || ''} onChange={(e) => handleDateChange('month', e.target.value)} className="w-1/3 bg-black border border-zinc-900 rounded-none p-4 text-white focus:outline-none focus:border-red-700 appearance-none text-center text-xs tracking-widest uppercase font-bold">
                     <option value="" disabled>Month</option>
                     {Array.from({length: 12}, (_, i) => {
                         const m = (i + 1).toString().padStart(2, '0');
@@ -190,25 +156,13 @@ const App: React.FC = () => {
                         return <option key={m} value={m} className="bg-black text-white">{name}</option>
                     })}
                 </select>
-                <input 
-                    type="text"
-                    inputMode="numeric"
-                    placeholder="DD" 
-                    value={day || ''}
-                    onChange={(e) => handleDateChange('day', e.target.value)}
-                    className="w-1/3 bg-black border border-zinc-900 rounded-none p-4 text-white placeholder-zinc-800 focus:outline-none focus:border-red-700 transition-all text-center text-xs tracking-widest"
-                />
+                <input type="text" inputMode="numeric" placeholder="DD" value={day || ''} onChange={(e) => handleDateChange('day', e.target.value)} className="w-1/3 bg-black border border-zinc-900 rounded-none p-4 text-white placeholder-zinc-800 focus:outline-none focus:border-red-700 transition-all text-center text-xs tracking-widest" />
             </div>
           </div>
-
           <div className="flex gap-4">
              <div className="flex-1">
                 <label className="block text-[10px] text-zinc-500 mb-2 ml-1 uppercase font-black tracking-[0.2em]">Time</label>
-                <select
-                  value={data?.birthTime || 'unknown'}
-                  onChange={(e) => handleChange('birthTime', e.target.value)}
-                  className="w-full bg-black border border-zinc-900 rounded-none p-4 text-white focus:outline-none focus:border-red-700 appearance-none text-center text-xs tracking-widest uppercase font-bold"
-                >
+                <select value={data?.birthTime || 'unknown'} onChange={(e) => handleChange('birthTime', e.target.value)} className="w-full bg-black border border-zinc-900 rounded-none p-4 text-white focus:outline-none focus:border-red-700 appearance-none text-center text-xs tracking-widest uppercase font-bold">
                     <option value="unknown" className="bg-black text-zinc-600">Unknown</option>
                     {Array.from({length: 24}, (_, i) => {
                         const t = i.toString().padStart(2, '0') + ":00";
@@ -216,16 +170,9 @@ const App: React.FC = () => {
                     })}
                 </select>
              </div>
-
              <div className="w-1/3">
-                <label className="block text-[10px] text-zinc-500 mb-2 ml-1 uppercase font-black tracking-[0.2em]">
-                    Gender <span className="text-red-700">*</span>
-                </label>
-                <select
-                  value={data?.gender || 'M'}
-                  onChange={(e) => handleChange('gender', e.target.value)}
-                  className="w-full bg-black border border-zinc-900 rounded-none p-4 text-white focus:outline-none focus:border-red-700 appearance-none text-center text-xs tracking-widest uppercase font-bold"
-                >
+                <label className="block text-[10px] text-zinc-500 mb-2 ml-1 uppercase font-black tracking-[0.2em]">Gender <span className="text-red-700">*</span></label>
+                <select value={data?.gender || 'M'} onChange={(e) => handleChange('gender', e.target.value)} className="w-full bg-black border border-zinc-900 rounded-none p-4 text-white focus:outline-none focus:border-red-700 appearance-none text-center text-xs tracking-widest uppercase font-bold">
                   <option value="M" className="bg-black">M</option>
                   <option value="F" className="bg-black">F</option>
                   <option value="Other" className="bg-black">O</option>
@@ -233,11 +180,7 @@ const App: React.FC = () => {
              </div>
           </div>
         </div>
-        <div className="pt-8">
-           <Button onClick={nextStep} disabled={!isReady}>
-             {copy.cta}
-           </Button>
-        </div>
+        <div className="pt-8"><Button onClick={nextStep} disabled={!isReady}>{copy.cta}</Button></div>
       </InputCard>
     );
   };
@@ -249,21 +192,10 @@ const App: React.FC = () => {
     const ph = isLove ? COPY.context.love_ph : COPY.context.money_ph;
     const val = isLove ? formData.relationshipStatus : formData.occupation;
     const field = isLove ? 'relationshipStatus' : 'occupation';
-
     return (
       <InputCard title={title} subtitle={subtitle}>
-        <input
-          type="text"
-          placeholder={ph}
-          value={val}
-          onChange={(e) => updateFormData(field, e.target.value)}
-          className="w-full bg-black border border-zinc-900 rounded-none p-4 text-white placeholder-zinc-800 focus:outline-none focus:border-red-700 transition-all uppercase tracking-widest text-xs font-medium"
-        />
-        <div className="pt-8">
-           <Button onClick={nextStep}>
-             {COPY.context.cta}
-           </Button>
-        </div>
+        <input type="text" placeholder={ph} value={val} onChange={(e) => updateFormData(field, e.target.value)} className="w-full bg-black border border-zinc-900 rounded-none p-4 text-white placeholder-zinc-800 focus:outline-none focus:border-red-700 transition-all uppercase tracking-widest text-xs font-medium" />
+        <div className="pt-8"><Button onClick={nextStep}>{COPY.context.cta}</Button></div>
       </InputCard>
     );
   };
@@ -271,21 +203,10 @@ const App: React.FC = () => {
   const renderFinalKey = () => {
     const isLove = formData.mode === 'LOVE';
     const ph = isLove ? COPY.final_key.love_ph : COPY.final_key.money_ph;
-    
     return (
       <InputCard title={COPY.final_key.title} subtitle={COPY.final_key.subtitle}>
-        <textarea
-          rows={3}
-          placeholder={ph}
-          value={formData.finalQuestion}
-          onChange={(e) => updateFormData('finalQuestion', e.target.value)}
-          className="w-full bg-black border border-zinc-900 rounded-none p-4 text-white placeholder-zinc-800 focus:outline-none focus:border-red-700 transition-all uppercase tracking-widest text-xs font-medium resize-none"
-        />
-        <div className="pt-8">
-           <Button onClick={runAnalysis}>
-             {COPY.final_key.cta}
-           </Button>
-        </div>
+        <textarea rows={3} placeholder={ph} value={formData.finalQuestion} onChange={(e) => updateFormData('finalQuestion', e.target.value)} className="w-full bg-black border border-zinc-900 rounded-none p-4 text-white placeholder-zinc-800 focus:outline-none focus:border-red-700 transition-all uppercase tracking-widest text-xs font-medium resize-none" />
+        <div className="pt-8"><Button onClick={runAnalysis}>{COPY.final_key.cta}</Button></div>
       </InputCard>
     );
   };
@@ -296,14 +217,13 @@ const App: React.FC = () => {
           <div className="absolute inset-0 bg-red-700 blur-[40px] opacity-40 animate-pulse" />
           <Loader2 className="w-16 h-16 text-red-700 animate-spin relative z-10" />
        </div>
-       <h2 className="text-3xl font-heading font-black text-white mb-4 uppercase italic">Accessing The Soul Code...</h2>
+       <h2 className="text-3xl font-heading font-black text-white mb-4 uppercase">Accessing The Soul Code...</h2>
        <p className="text-[10px] text-zinc-500 font-black uppercase tracking-[0.4em]">Decoding Trajectory // 2026+</p>
     </div>
   );
 
   const getStepContent = () => {
     if (step === 0) return renderModeSelect();
-    
     if (formData.mode === 'LOVE') {
       if (step === 1) return renderPersonForm('user');
       if (step === 2) return renderPersonForm('partner');
@@ -322,19 +242,8 @@ const App: React.FC = () => {
   };
 
   return (
-    <PayPalScriptProvider options={{ 
-      clientId: PAYPAL_CLIENT_ID,
-      currency: "USD",
-      intent: "capture",
-      components: "buttons",
-      vault: false
-    }}>
-      <Layout 
-        onBack={prevStep} 
-        showBack={step > 0 && !result} 
-        step={step} 
-        totalSteps={totalSteps}
-      >
+    <PayPalScriptProvider options={{ clientId: PAYPAL_CLIENT_ID, currency: "USD", intent: "capture", components: "buttons", vault: false }}>
+      <Layout onBack={prevStep} showBack={step > 0 && !result} step={step} totalSteps={totalSteps}>
         {getStepContent()}
       </Layout>
     </PayPalScriptProvider>
